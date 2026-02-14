@@ -4,23 +4,13 @@ from model.predictor import predict_crop
 
 app = Flask(__name__)
 
-# =========================
-# Replace with your API Key
-# =========================
 API_KEY = "8f554542bd68933d8c57355a0edbd308"
 
-
-# =========================
-# HOME ROUTE
-# =========================
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
-# =========================
-# CURRENT WEATHER + AI CROP
-# =========================
 @app.route("/get-weather", methods=["POST"])
 def get_weather():
 
@@ -28,7 +18,6 @@ def get_weather():
     lat = data.get("lat")
     lng = data.get("lng")
 
-    # -------- Current Weather --------
     weather_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lng}&appid={API_KEY}&units=metric"
     weather_response = requests.get(weather_url)
 
@@ -43,7 +32,6 @@ def get_weather():
     description = weather_data["weather"][0]["description"]
     city = weather_data.get("name", "Unknown Location")
 
-    # -------- Forecast (to get rainfall average) --------
     forecast_url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lng}&appid={API_KEY}&units=metric"
     forecast_response = requests.get(forecast_url)
 
@@ -59,11 +47,9 @@ def get_weather():
         if rain_values:
             rainfall_avg = sum(rain_values) / len(rain_values)
 
-    # -------- AI Prediction --------
     prediction = predict_crop(temperature, humidity, rainfall_avg)
 
 
-    # Risk logic (simple)
     risk = "Low"
     if wind > 10:
         risk = "High"
@@ -84,10 +70,6 @@ def get_weather():
 })
 
 
-
-# =========================
-# FORECAST ROUTE (For Charts)
-# =========================
 @app.route("/get-forecast", methods=["POST"])
 def get_forecast():
 
@@ -118,9 +100,6 @@ def get_forecast():
         "rain": rain
     })
 
-
-# =========================
-# RUN APP
-# =========================
 if __name__ == "__main__":
     app.run(debug=True)
+
